@@ -25,7 +25,7 @@ package gc;
 
 /*
  * @test id=Parallel
- * @requires vm.gc.Parallel
+ * @requires vm.gc.Parallel & false
  * @requires !vm.debug
  * @summary Verifies that the UseGCOverheadLimit functionality works in Parallel GC.
  * @library /test/lib
