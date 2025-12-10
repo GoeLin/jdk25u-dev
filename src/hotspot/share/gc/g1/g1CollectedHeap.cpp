@@ -28,6 +28,7 @@
 #include "code/codeCache.hpp"
 #include "compiler/oopMap.hpp"
 #include "gc/g1/g1Allocator.inline.hpp"
+#include "gc/g1/g1Analytics.hpp"
 #include "gc/g1/g1Arguments.hpp"
 #include "gc/g1/g1BarrierSet.hpp"
 #include "gc/g1/g1BatchedTask.hpp"
@@ -918,12 +919,12 @@ void G1CollectedHeap::update_gc_overhead_counter() {
     return;
   }
 
-  bool gc_time_over_limit = (_policy->analytics()->long_term_gc_time_ratio() * 100) >= GCTimeLimit;
+  bool gc_time_over_limit = (_policy->analytics()->long_term_pause_time_ratio() * 100) >= GCTimeLimit;
   double free_space_percent = percent_of(num_available_regions() * G1HeapRegion::GrainBytes, max_capacity());
   bool free_space_below_limit = free_space_percent < GCHeapFreeLimit;
 
   log_debug(gc)("GC Overhead Limit: GC Time %f Free Space %f Counter %zu",
-                (_policy->analytics()->long_term_gc_time_ratio() * 100),
+                (_policy->analytics()->long_term_pause_time_ratio() * 100),
                 free_space_percent,
                 _gc_overhead_counter);
 
