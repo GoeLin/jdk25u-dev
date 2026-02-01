@@ -31,6 +31,7 @@
 #include "jfr/recorder/repository/jfrEmergencyDump.hpp"
 #include "jfr/recorder/service/jfrOptionSet.hpp"
 #include "jfr/recorder/service/jfrOptionSet.hpp"
+#include "jfr/recorder/service/jfrRecorderService.hpp"
 #include "jfr/recorder/repository/jfrRepository.hpp"
 #include "jfr/support/jfrKlassExtension.hpp"
 #include "jfr/support/jfrResolution.hpp"
@@ -170,4 +171,10 @@ bool Jfr::on_flight_recorder_option(const JavaVMOption** option, char* delimiter
 
 bool Jfr::on_start_flight_recording_option(const JavaVMOption** option, char* delimiter) {
   return JfrOptionSet::parse_start_flight_recording_option(option, delimiter);
+}
+
+void Jfr::on_report_java_out_of_memory() {
+  if (CrashOnOutOfMemoryError && JfrRecorder::is_recording()) {
+    JfrRecorderService::emit_leakprofiler_events_on_oom();
+  }
 }

@@ -78,6 +78,7 @@ class Jfr : AllStatic {
   static void initialize_main_thread(JavaThread* jt);
   static bool has_sample_request(JavaThread* jt);
   static void check_and_process_sample_request(JavaThread* jt);
+  static void on_report_java_out_of_memory();
 };
 
 #endif // SHARE_JFR_JFR_HPP
