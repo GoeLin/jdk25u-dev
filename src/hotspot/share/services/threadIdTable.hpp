@@ -36,14 +36,14 @@ class ThreadIdTableConfig;
 class ThreadIdTable : public AllStatic {
   friend class ThreadIdTableConfig;
 
-  static Atomic<bool> _is_initialized;
+  static volatile bool _is_initialized;
   static volatile bool _has_work;
 
 public:
   // Initialization
   static void lazy_initialize(const ThreadsList* threads);
   static bool is_initialized_acquire() {
-    return _is_initialized.load_acquire();
+    return Atomic::load_acquire(&_is_initialized);
   }
 
   // Lookup and list management
