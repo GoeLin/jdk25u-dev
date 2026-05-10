@@ -499,8 +499,7 @@ void ShenandoahAsserts::assert_control_or_vm_thread_at_safepoint(bool at_safepoi
 }
 
 void ShenandoahAsserts::assert_generations_reconciled(const char* file, int line) {
-  if (!ShenandoahSafepoint::is_at_shenandoah_safepoint()) {
-    // Only shenandoah safepoint operations participate in the active/gc generation scheme
+  if (!SafepointSynchronize::is_at_safepoint()) {
     return;
   }
 
@@ -511,6 +510,6 @@ void ShenandoahAsserts::assert_generations_reconciled(const char* file, int line
     return;
   }
 
-  ShenandoahMessageBuffer msg("Active(%s) & GC(%s) Generations aren't reconciled", agen->name(), ggen->name());
+  ShenandoahMessageBuffer msg("Active(%d) & GC(%d) Generations aren't reconciled", agen->type(), ggen->type());
   report_vm_error(file, line, msg.buffer());
 }

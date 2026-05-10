@@ -75,7 +75,6 @@ ShenandoahHeapRegion::ShenandoahHeapRegion(HeapWord* start, size_t index, bool c
   _plab_allocs(0),
   _live_data(0),
   _critical_pins(0),
-  _mixed_candidate_garbage_words(0),
   _update_watermark(start),
   _age(0),
 #ifdef SHENANDOAH_CENSUS_NOISE
@@ -566,14 +565,13 @@ void ShenandoahHeapRegion::recycle_internal() {
   assert(_recycling.is_set() && is_trash(), "Wrong state");
   ShenandoahHeap* heap = ShenandoahHeap::heap();
 
-  _mixed_candidate_garbage_words = 0;
   set_top(bottom());
   clear_live_data();
   reset_alloc_metadata();
   heap->marking_context()->reset_top_at_mark_start(this);
   set_update_watermark(bottom());
   if (ZapUnusedHeapArea) {
-    SpaceMangler::mangle_region(MemRegion(bottom(), top()));
+    SpaceMangler::mangle_region(MemRegion(bottom(), end()));
   }
 
   make_empty();

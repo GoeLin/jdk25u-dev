@@ -77,8 +77,9 @@ void ShenandoahMark::do_task(ShenandoahObjToScanQueue* q, T* cl, ShenandoahLiveD
   if (task->is_not_chunked()) {
     if (obj->is_instance()) {
       // Case 1: Normal oop, process as usual.
-      if (obj->is_stackChunk()) {
-        // Loom doesn't support mixing of weak marking and strong marking of stack chunks.
+      if (ContinuationGCSupport::relativize_stack_chunk(obj)) {
+          // Loom doesn't support mixing of weak marking and strong marking of
+          // stack chunks.
         cl->set_weak(false);
       }
 
@@ -117,11 +118,13 @@ inline void ShenandoahMark::count_liveness(ShenandoahLiveData* live_data, oop ob
   // Age census for objects in the young generation
   if (GENERATION == YOUNG || (GENERATION == GLOBAL && region->is_young())) {
     assert(heap->mode()->is_generational(), "Only if generational");
+    if (ShenandoahGenerationalAdaptiveTenuring) {
     assert(region->is_young(), "Only for young objects");
-    const uint age = ShenandoahHeap::get_object_age(obj);
+      uint age = ShenandoahHeap::get_object_age(obj);
     ShenandoahAgeCensus* const census = ShenandoahGenerationalHeap::heap()->age_census();
     CENSUS_NOISE(census->add(age, region->age(), region->youth(), size, worker_id);)
     NO_CENSUS_NOISE(census->add(age, region->age(), size, worker_id);)
+  }
   }
 
   if (!region->is_humongous_start()) {
