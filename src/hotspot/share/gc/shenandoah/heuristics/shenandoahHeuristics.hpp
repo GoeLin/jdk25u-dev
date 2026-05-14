@@ -129,13 +129,6 @@ protected:
 #endif
     }
 
-    inline void update_livedata(size_t live) {
-      _region_union._live_data = live;
-#ifdef ASSERT
-      _union_tag = is_live_data;
-#endif
-    }
-
     inline ShenandoahHeapRegion* get_region() const {
       assert(_union_tag != is_uninitialized, "Cannot fetch region from uninitialized RegionData");
       return _region;
@@ -225,7 +218,7 @@ public:
 
   virtual void record_success_concurrent();
 
-  virtual void record_degenerated();
+  virtual void record_success_degenerated();
 
   virtual void record_success_full();
 

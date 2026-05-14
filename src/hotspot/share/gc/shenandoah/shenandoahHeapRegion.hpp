@@ -43,7 +43,6 @@ class ShenandoahHeapRegion {
   friend class VMStructs;
   friend class ShenandoahHeapRegionStateConstant;
 private:
-
   /*
     Region state is described by a state machine. Transitions are guarded by
     heap lock, which allows changing the state of several regions atomically.
@@ -217,7 +216,7 @@ public:
   bool is_alloc_allowed()          const { auto cur_state = state(); return is_empty_state(cur_state) || cur_state == _regular || cur_state == _pinned; }
   bool is_stw_move_allowed()       const { auto cur_state = state(); return cur_state == _regular || cur_state == _cset || (ShenandoahHumongousMoves && cur_state == _humongous_start); }
 
-  RegionState state()              const { return Atomic::load_acquire(&_state); }
+  RegionState state()              const { return Atomic::load(&_state); }
   int  state_ordinal()             const { return region_state_to_ordinal(state()); }
 
   void record_pin();
@@ -259,8 +258,6 @@ private:
 
   volatile size_t _live_data;
   volatile size_t _critical_pins;
-
-  size_t _mixed_candidate_garbage_words;
 
   HeapWord* volatile _update_watermark;
 
@@ -382,14 +379,6 @@ public:
   inline size_t get_live_data_bytes() const;
   inline size_t get_live_data_words() const;
 
-  inline size_t get_mixed_candidate_live_data_bytes() const;
-  inline size_t get_mixed_candidate_live_data_words() const;
-
-  inline void capture_mixed_candidate_garbage();
-
-  // Returns garbage by calculating difference between used and get_live_data_words.  The value returned is only
-  // meaningful immediately following completion of marking.  If there have been subsequent allocations in this region,
-  // use a different approach to determine garbage, such as (used() - get_mixed_candidate_live_data_bytes())
   inline size_t garbage() const;
 
   void print_on(outputStream* st) const;
